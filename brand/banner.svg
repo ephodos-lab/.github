@@ -1,13 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="480" viewBox="0 0 1600 480">
   <title>Ephodos Lab</title>
-  <rect width="1600" height="400" fill="#102033"/>
-  <g transform="translate(96,72) scale(0.28125)">
-    <circle cx="284" cy="404" r="158" fill="#E0703F"/>
-  <rect x="600" y="282" width="280" height="280" fill="#F1E7D3"/>
-  <line x1="140" y1="592" x2="884" y2="592" stroke="#F1E7D3" stroke-width="60" stroke-linecap="round"/>
-  <path d="M512 622 L416 780 L608 780 Z" fill="#F1E7D3" stroke="#F1E7D3" stroke-width="14" stroke-linejoin="round"/>
+  <defs>
+    <radialGradient id="glow" cx="38%" cy="50%" r="75%">
+      <stop offset="0" stop-color="#16213A"/><stop offset="1" stop-color="#0B1220"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="480" fill="url(#glow)"/>
+  <g fill="none" stroke="#EAE3D2" stroke-opacity="0.07" stroke-width="2">
+    <circle cx="1380" cy="240" r="300"/>
+    <rect x="1114.1" y="-25.9" width="531.8" height="531.8"/>
+    <line x1="900" y1="240" x2="1600" y2="240"/>
+    <line x1="1380" y1="0" x2="1380" y2="480"/>
   </g>
-  <text x="470" y="196" font-family="Palatino Linotype, Book Antiqua, Palatino, serif" font-size="112" fill="#F1E7D3" letter-spacing="2">Ephodos Lab</text>
-  <text x="474" y="262" font-family="Palatino Linotype, Book Antiqua, Palatino, serif" font-size="38" fill="#F1E7D3" fill-opacity="0.78">Open tools for automated mathematical research</text>
-  <text x="474" y="318" font-family="Palatino Linotype, Book Antiqua, Palatino, serif" font-style="italic" font-size="30" fill="#E0703F">&#7956;&#966;&#959;&#948;&#959;&#962; &#183; the method</text>
+  <g transform="translate(150,90) scale(0.293)">
+    <circle cx="512" cy="512" r="360" fill="none" stroke="#C9A45C" stroke-width="14"/>
+    <circle cx="512" cy="512" r="326" fill="none" stroke="#C9A45C" stroke-width="4" stroke-opacity="0.7"/>
+    <path fill="#EAE3D2" d="M630.732421875 341.150390625 633.427734375 415.271484375H626.9140625Q622.421875 396.62890625 616.9189453125 384.5Q611.416015625 372.37109375 601.30859375 365.9697265625Q591.201171875 359.568359375 573.681640625 359.568359375H506.97265625V498.6015625H560.205078125Q584.013671875 498.6015625 594.9072265625 488.044921875Q605.80078125 477.48828125 607.59765625 456.82421875H614.111328125V553.85546875H607.59765625Q604.228515625 531.84375 591.201171875 524.431640625Q578.173828125 517.01953125 560.205078125 517.01953125H506.97265625V612.25390625Q506.97265625 653.58203125 549.6484375 653.58203125H569.86328125Q590.302734375 653.58203125 603.2177734375 648.19140625Q616.1328125 642.80078125 624.5556640625 629.6611328125Q632.978515625 616.521484375 639.716796875 592.48828125H646.23046875L641.2890625 672.0H391.97265625V665.486328125Q418.02734375 665.486328125 425.6640625 653.6943359375Q433.30078125 641.90234375 433.30078125 622.810546875V391.013671875Q433.30078125 372.8203125 426.337890625 360.2421875Q419.375 347.6640625 394.21875 347.6640625H391.97265625V341.150390625Z"/>
+  </g>
+  <text x="520" y="168" font-family="Palatino Linotype, serif" font-size="24" letter-spacing="9" fill="#C9A45C">&#917;&#934;&#927;&#916;&#927;&#931; &#183; THE METHOD</text>
+  <text x="514" y="262" font-family="Perpetua Titling MT" font-weight="300" font-size="88" letter-spacing="14" fill="#EAE3D2">EPHODOS LAB</text>
+  <line x1="520" y1="300" x2="760" y2="300" stroke="#C9A45C" stroke-width="2"/>
+  <text x="520" y="352" font-family="Garamond, Palatino Linotype, serif" font-style="italic" font-size="38" fill="#EAE3D2" fill-opacity="0.82">Open tools for automated mathematical research</text>
 </svg>

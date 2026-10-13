@@ -23,7 +23,7 @@ Repositories appear on this page as they are released.
 
 ## Why "Ephodos"
 
-*Ephodos* (ἔφοδος, "the method") is the title of a letter from Archimedes to Eratosthenes. In it Archimedes explains how he found results such as the volume of the sphere by weighing shapes against each other on a lever, and why he still proved them afterwards by rigorous geometry. He wrote the method down in the hope that others would use it to find theorems he had not thought of. Our logo is that balance: a circle and a square of equal area, weighed on a lever.
+*Ephodos* (ἔφοδος, "the method") is the title of a letter from Archimedes to Eratosthenes. In it Archimedes explains how he found results such as the volume of the sphere by weighing shapes against each other on a lever, and why he still proved them afterwards by rigorous geometry. He wrote the method down in the hope that others would use it to find theorems he had not thought of.
 
 ---
 
@@ -49,6 +49,6 @@ Ephodos Lab 开发用于自动化数学研究的开源工具，覆盖一个研�
 
 ### 名字的来历
 
-*Ephodos*（ἔφοδος，意为「方法」）是阿基米德写给埃拉托色尼的一封信的标题。阿基米德在信里讲，他先在杠杆上称量图形，由此发现球的体积等结果，之后仍用严格的几何证明它们。他把这个方法写下来，是希望别人能用它发现他自己还没想到的定理。我们的标志就是这架杠杆：一个圆和一个面积相等的正方形。
+*Ephodos*（ἔφοδος，意为「方法」）是阿基米德写给埃拉托色尼的一封信的标题。阿基米德在信里讲，他先在杠杆上称量图形，由此发现球的体积等结果，之后仍用严格的几何证明它们。他把这个方法写下来，是希望别人能用它发现他自己还没想到的定理。
 
 </details>
