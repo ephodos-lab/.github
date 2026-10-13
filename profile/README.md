@@ -9,7 +9,7 @@ Ephodos Lab builds open-source tools for automated mathematical research. They c
 | Project | Stage | What it does | Status |
 | --- | --- | --- | --- |
 | **topic-gate** | Problem selection | Agents propose research problems. Fresh reviewer agents try to rule each one out, and only problems that survive reach a human for approval. | Coming soon |
-| **Danus** | Research | A main agent directs a team of proving agents. A fresh verifier checks every claim before it enters a shared fact graph. Our fork of [frenzymath/Danus](https://github.com/frenzymath/Danus) (Apache-2.0). | Coming soon |
+| **proofsiege** | Research | A team of AI agents lays siege to one problem until it is proved or refuted. A fresh verifier checks every claim before later work may build on it. Based on [frenzymath/Danus](https://github.com/frenzymath/Danus) (Apache-2.0). | Coming soon |
 | **mathgalley** | Writing | Turns notes, proofs, code and existing manuscripts into a paper, then reviews it before submission. | In development |
 | Integrated platform | All three | Runs the three stages as one pipeline. | Planned |
 
@@ -37,7 +37,7 @@ Ephodos Lab 开发用于自动化数学研究的开源工具，覆盖一个研�
 | 项目 | 阶段 | 做什么 | 状态 |
 | --- | --- | --- | --- |
 | **topic-gate** | 选题 | agent 提出研究问题，再由新开的审稿 agent 设法否掉它们，挺过审查的题才交给人决定是否放行。 | 即将发布 |
-| **Danus** | 研究 | 主 agent 指挥一组证明 agent，每条结论进入共享事实图之前，都要由新开的 verifier 核查。基于 [frenzymath/Danus](https://github.com/frenzymath/Danus)（Apache-2.0）的分支。 | 即将发布 |
+| **proofsiege** | 研究 | 一组 AI agent 围攻一道题，直到证明或否证它；每条结论都要先由新开的 verifier 核查，后续工作才能以它为基础。基于 [frenzymath/Danus](https://github.com/frenzymath/Danus)（Apache-2.0）。 | 即将发布 |
 | **mathgalley** | 写作 | 把笔记、证明、代码和已有稿件整理成论文，并在投稿前审查。 | 开发中 |
 | 一体化平台 | 全流程 | 把三个阶段串成一条流水线。 | 规划中 |
 
