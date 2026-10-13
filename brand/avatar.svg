@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Ephodos Lab</title>
+  <rect width="1024" height="1024" fill="#102033"/>
+  <circle cx="284" cy="404" r="158" fill="#E0703F"/>
+  <rect x="600" y="282" width="280" height="280" fill="#F1E7D3"/>
+  <line x1="140" y1="592" x2="884" y2="592" stroke="#F1E7D3" stroke-width="60" stroke-linecap="round"/>
+  <path d="M512 622 L416 780 L608 780 Z" fill="#F1E7D3" stroke="#F1E7D3" stroke-width="14" stroke-linejoin="round"/>
+</svg>
