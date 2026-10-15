@@ -1,15 +1,24 @@
 """Generate the Ephodos Lab brand assets as SVG.
 
-The mark is a dotted vortex: 32 arms of dots spiral into an off-centre throat,
-seen at an angle. Its geometry is fully parametric; the parameters below were
-measured from the original concept artwork. The wordmark sets EPHODOS LAB in
-Cormorant Garamond with the first O drawn as a crescent; the tagline is Jost.
+The mark is one formula. Take a lattice that is uniform in log-polar coordinates,
+
+    r = q^-j,   theta = 2 pi k / N + j d        (arm k = 0..N-1, ring j = 0..J),
+
+lift it onto the logarithmic funnel z = c ln r, and look at it through a pinhole camera
+tilted by `tilt`. Each ring is the one outside it scaled by 1/q, turned by d and sunk by
+c ln q, so every arm is a logarithmic spiral and the rings fall evenly into the throat.
+A dot's radius is proportional to r (the pattern is self-similar) times the camera's
+perspective, so near dots are larger. The hairlines are the same spirals drawn
+continuously.
+
+The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent;
+the tagline is Jost.
 
     python build.py --fonts DIR --out DIR
 
-DIR must contain CormorantGaramond[wght].ttf and Jost[wght].ttf, both under the
-SIL Open Font License, from https://github.com/google/fonts (ofl/cormorantgaramond
-and ofl/jost). Requires numpy and fontTools.
+DIR must contain CormorantGaramond[wght].ttf and Jost[wght].ttf, both under the SIL Open
+Font License, from https://github.com/google/fonts (ofl/cormorantgaramond and ofl/jost).
+Requires numpy and fontTools.
 """
 import argparse
 import functools
@@ -27,82 +36,40 @@ INK, PAPER, IVORY = "#0B1220", "#FFFFFF", "#EAE3D2"
 
 # ---------------------------------------------------------------- the mark
 
-# Arm curve: a ring parameter t runs from the throat (0) to the rim (1). Each ring is an
-# ellipse whose centre slides from the throat centre H to the rim centre C as t grows.
-CURVE = dict(k=0.71, m=1.02, k_throat=1.6, p_throat=6.0,          # twist: gentle overall, strong at the throat
-             mu=3.02, nu=1.20, rt=0.068,                           # centre slide, radius growth, throat radius
-             C=(660.0, 475.0), H=(613.0, 496.0),                   # rim and throat centres
-             A=314.0, B=238.0, beta=142.5, lam=0.6)                # rim semi-axes, major-axis angle, roundness easing
-N_ARMS = 32
-ARM_ANGLES = (4.2771, 7.6065, 180.2156, 5.2225, 6.9226)          # a0, c1, p1, c2, p2: alpha_i = a0 + phi + c1 sin(phi-p1) + c2 sin(2phi-p2)
-ARM_LENGTH = (0.9638, 0.009, 0.0078, 0.0405, -0.0005, 0.0072, 0.0085, 0.1131, 291.573, 19.5836)
-TIP_RADIUS = (7.9233, -1.315, -0.3659, 1.8679, -1.1191, 0.3946, 0.0608, 0.7581, 307.2723, 11.5716)
-DOT_RADIUS = (5.4219, -1.0844, 0.5499, 0.1165, -0.6628, 0.8446, -0.0307, 0.3309, 0.0184, -0.0322, 0.4364, 314.7678, 26.6343)
-SPACING = (1.1219, 0.0287)                                        # s_j / s_(j+1) = a + b s_j
-TIP_GAP = 1.20                                                   # the bead at the end sits a little further out
-THROAT = dict(floor=1.3, ring=(25.0, 195.0), void=(195.0, 245.0), void_t=0.34)
+VORTEX = dict(
+    N=32,                       # arms
+    q=1.17,                     # each ring is 1/q the size of the one outside it
+    d=2 * math.pi / 32 / 3,     # ...and turned by a third of the arm spacing
+    c=0.14,                     # funnel depth: z = c ln r
+    r_min=0.15,                 # the throat: rings stop at this radius
+    tilt=math.radians(45),      # camera tilt
+    dist=3.4,                   # camera distance, in rim radii
+    spin=math.radians(225),     # turn of the finished image
+    rho=0.023,                  # dot radius as a fraction of r
+)
 
 
-def _harmonics(c, deg, tail=None):
-    a = math.radians(deg)
-    v = c[0] + sum(c[2 * k - 1] * math.cos(k * a) + c[2 * k] * math.sin(k * a) for k in range(1, (len(c) - 1) // 2 + 1))
-    if tail is not None:
-        depth, centre, width = tail
-        d = (deg - centre + 180) % 360 - 180
-        v *= 1 - depth * math.exp(-(d / width) ** 2)
-    return v
+def _project(x, y, z, v):
+    ct, st = math.cos(v["tilt"]), math.sin(v["tilt"])
+    y2, z2 = y * ct - z * st, y * st + z * ct
+    f = v["dist"] / (v["dist"] - z2)
+    X, Y = x * f, y2 * f
+    cs, ss = math.cos(v["spin"]), math.sin(v["spin"])
+    return X * cs - Y * ss, -(X * ss + Y * cs), f            # screen y points down
 
 
-def _arm_xy(alpha, t):
-    c = CURVE
-    t = np.asarray(t, float)
-    out = np.clip(1 - t, 0, None)
-    th = math.radians(alpha) + c["k"] * out ** c["m"] + c["k_throat"] * out ** c["p_throat"]
-    rho = c["rt"] + (1 - c["rt"]) * t ** c["nu"]
-    roundness = 1.0 + (c["B"] / c["A"] - 1.0) * t ** c["lam"]
-    cx = c["H"][0] + (c["C"][0] - c["H"][0]) * t ** c["mu"]
-    cy = c["H"][1] + (c["C"][1] - c["H"][1]) * t ** c["mu"]
-    u, v = c["A"] * rho * np.cos(th), c["A"] * roundness * rho * np.sin(th)
-    b = math.radians(c["beta"])
-    return cx + u * math.cos(b) - v * math.sin(b), cy + u * math.sin(b) + v * math.cos(b)
-
-
-def _dot_radius(alpha, s):
-    p = DOT_RADIUS
-    a = math.radians(alpha)
-    four = lambda c: c[0] + c[1] * math.cos(a) + c[2] * math.sin(a) + c[3] * math.cos(2 * a) + c[4] * math.sin(2 * a)
-    d = (alpha - p[11] + 180) % 360 - 180
-    return four(p[:5]) * (1 - p[10] * math.exp(-(d / p[12]) ** 2)) * np.asarray(s) ** four(p[5:10])
-
-
-def vortex(t_min=0.004, omit_r=0.8):
-    """Return the arms of the mark as dicts of dot centres, radii and a hairline, in source pixel units."""
-    a0, c1, p1, c2, p2 = ARM_ANGLES
+def vortex(v=VORTEX):
+    """The arms of the mark: dot centres, dot radii and the spiral through them."""
+    J = int(math.floor(math.log(1 / v["r_min"]) / math.log(v["q"])))
     arms = []
-    for i in range(N_ARMS):
-        phi = 360.0 * i / N_ARMS
-        alpha = (a0 + phi + c1 * math.sin(math.radians(phi - p1)) + c2 * math.sin(math.radians(2 * phi - p2))) % 360
-        t_end = _harmonics(ARM_LENGTH[:7], alpha, ARM_LENGTH[7:])
-        ts, t = [t_end], t_end / TIP_GAP
-        while t >= t_min:
-            ts.append(t)
-            t /= SPACING[0] + SPACING[1] * t
-        ts = np.array(ts)
-        x, y = _arm_xy(alpha, ts)
-        r = _dot_radius(alpha, ts)
-        r[0] = _harmonics(TIP_RADIUS[:7], alpha, TIP_RADIUS[7:])
-        # the throat: a dense ring on the near wall, a clear opening on the far side
-        ang = np.degrees(np.arctan2(y - CURVE["H"][1], x - CURVE["H"][0])) % 360
-        wall = (ang >= THROAT["ring"][0]) & (ang <= THROAT["ring"][1])
-        r = np.where((ts < 0.3) & wall, np.maximum(r, THROAT["floor"] * (0.55 + 0.45 * ts / 0.3)), r)
-        void = (ang > THROAT["void"][0]) & (ang < THROAT["void"][1])
-        r = np.where(void, r * np.clip(ts / THROAT["void_t"], 0, 1) ** 2, r)
-        keep = r >= omit_r
-        ts, x, y, r = ts[keep], x[keep], y[keep], r[keep]
-        if not len(ts):
-            continue
-        lt = np.linspace(ts.min(), ts.max(), 160)
-        arms.append({"x": x, "y": y, "r": r, "line": _arm_xy(alpha, lt)})
+    for k in range(v["N"]):
+        def at(j):
+            r = v["q"] ** -np.asarray(j, float)
+            t = 2 * math.pi * k / v["N"] + np.asarray(j, float) * v["d"]
+            return _project(r * np.cos(t), r * np.sin(t), v["c"] * np.log(r), v) + (r,)
+        x, y, f, r = at(np.arange(J + 1))
+        lx, ly, _, _ = at(np.linspace(0, J, 40 * J + 1))
+        arms.append({"x": x, "y": y, "r": v["rho"] * r * f, "line": (lx, ly)})
     return arms
 
 
@@ -112,11 +79,11 @@ def mark_bounds(arms):
     return xs.min(), ys.min(), xs.max() - xs.min(), ys.max() - ys.min()
 
 
-def mark_svg(arms, box, color, hairline=1.05, hairline_opacity=0.75, dot_scale=1.0, min_px=0.0):
+def mark_svg(arms, box, color, hairline=0.0016, hairline_opacity=0.75, dot_scale=1.0, min_px=0.4):
     """SVG group drawing the mark scaled into box = (x, y, width, height), centred.
 
-    dot_scale enlarges every dot (a heavier cut for small sizes); dots smaller than min_px
-    after scaling are left out."""
+    hairline is the line width as a fraction of the drawn width. dot_scale enlarges every dot
+    (a heavier cut for small sizes); dots smaller than min_px after scaling are left out."""
     x0, y0, w, h = mark_bounds(arms)
     s = min(box[2] / w, box[3] / h)
     ox, oy = box[0] + (box[2] - w * s) / 2 - x0 * s, box[1] + (box[3] - h * s) / 2 - y0 * s
@@ -124,7 +91,7 @@ def mark_svg(arms, box, color, hairline=1.05, hairline_opacity=0.75, dot_scale=1
     lines = "".join('<polyline points="%s"/>' % " ".join(f"{f(ox + px * s)},{f(oy + py * s)}" for px, py in zip(*a["line"])) for a in arms)
     dots = "".join(f'<circle cx="{f(ox + px * s)}" cy="{f(oy + py * s)}" r="{f(pr * s * dot_scale)}"/>'
                    for a in arms for px, py, pr in zip(a["x"], a["y"], a["r"]) if pr * s * dot_scale >= min_px)
-    return (f'<g fill="none" stroke="{color}" stroke-width="{f(hairline * s)}" stroke-opacity="{hairline_opacity}" '
+    return (f'<g fill="none" stroke="{color}" stroke-width="{f(hairline * w * s)}" stroke-opacity="{hairline_opacity}" '
             f'stroke-linecap="round" stroke-linejoin="round">{lines}</g><g fill="{color}">{dots}</g>')
 
 
@@ -255,8 +222,8 @@ def build(fonts, out):
 
     # avatar: the mark on white
     for name, bg, ink in (("avatar.svg", PAPER, INK), ("avatar-on-dark.svg", INK, IVORY)):
-        files[name] = svg_doc(1024, 1024, mark_svg(arms, (92, 92, 840, 840), ink, hairline=2.2, hairline_opacity=0.9,
-                                                    dot_scale=1.75, min_px=2.2), "Ephodos Lab", bg=bg)
+        files[name] = svg_doc(1024, 1024, mark_svg(arms, (92, 92, 840, 840), ink, hairline=0.0032, hairline_opacity=0.9,
+                                                    dot_scale=1.6, min_px=1.5), "Ephodos Lab", bg=bg)
     # banner for the organisation profile
     W, Hh = 1600, 480
     _, _, mw, mh = mark_bounds(arms)
