@@ -2,15 +2,19 @@
 
 The mark is a dotted vortex, a picture of many lines of work converging on one problem, and it is built from the golden ratio $\varphi$. Start from the lattice
 
-$$r = q^{-j},\qquad \theta = \frac{2\pi k}{N} + j\,\delta \qquad (k = 0,\dots,N-1;\ j = 0,\dots,J),\qquad q = \varphi^{1/3},$$
+$$r = \varphi^{-j/2},\qquad \theta = \frac{2\pi}{N}\left(k + \frac{j}{\varphi^{2}}\right) \qquad (k = 0,\dots,N-1;\ j = 0,\dots,13).$$
 
-place it on the logarithmic funnel $z = c\ln r$, and view it through a tilted pinhole camera. Each ring is the ring outside it scaled by $1/q$, turned by $\delta$ and sunk by $c\ln q$, so three rings make one $\varphi$ and every arm is a logarithmic spiral.
+Two rings make one $\varphi$ and each ring is turned by $1/\varphi^2$ of the gap between arms, so every arm is a logarithmic spiral. Lay the lattice on the funnel $z = \ln r$ and view it obliquely, so that depth slides each ring along the major axis:
 
-A spiral $r = r_{\min}\,\varphi^{4(\theta-\theta_0)/\pi}$, which grows by $\varphi$ every eighth of a turn, runs from the throat to the rim. If $\psi$ is a point's angle measured from that spiral, the dots shrink inside a smooth band centred on it:
+$$x = r\cos\theta + a\ln\frac{1}{r},\qquad y = \varepsilon\, r\sin\theta,$$
 
-$$\text{radius} = \rho\, r^{\gamma} f\,(1 - W b),\qquad b = \left(\frac{1 + \cos\psi}{2}\right)^{s},\qquad W = w_{\text{rim}} + (1 - w_{\text{rim}})\left(\frac{\ln r}{\ln r_{\min}}\right)^{\kappa},$$
+with $a$ just under the throat radius $r_{\min} = \varphi^{-13/2}$, so the near wall never folds over. The throat then sits off centre, and its far wall is seen almost edge-on as a dense crescent.
 
-where $f$ is the camera's perspective factor. The band is deepest at the throat and still dims the rim, so the fade sweeps as one continuous band from the centre all the way out. The values are $N = 32$, $\delta = 2\pi/96$ (a third of the arm spacing), $c = 0.14$, a tilt of $45^\circ$, $r_{\min} = 0.15$, $\gamma = 0.5$, $\theta_0 = 270^\circ$, $s = 3$, $w_{\text{rim}} = 0.65$ and $\kappa = 0.5$.
+The dots fade along a band centred on a second logarithmic spiral, $\theta = \theta_0 - \pi u$ with $u = \ln(r/r_{\min}) / \ln(1/r_{\min})$. It leaves the throat at $\theta_0$ and turns half a turn, the same way as the arms, on its way out to the rim. With $\psi = \theta - \theta_0 + \pi u$ a point's angle from the band,
+
+$$b = \left(\frac{1 + \cos\psi}{2}\right)^{s\,r^{1/3}},\qquad m = 1 - (1 - c\,u)\,b .$$
+
+Each dot has radius $\rho\, r^{\gamma} m$, and the outermost dot of each arm is $\varphi$ times larger. Each arm is drawn as a stroke whose half-width is a tenth of $\rho\, r^{\gamma}$ times $m^4$. The band is wide and deep at the throat and narrows, but stays deep, out to the rim, so it reads as a white spiral running from the throat through the outermost ring. The values are $N = 32$, $\varepsilon = 2/3$, $a = 0.98\, r_{\min}$, $\theta_0 = 125^\circ$, $s = 13$, $c = 0.15$, $\rho = 0.02$ and $\gamma = 1/2$. The image is turned so that the throat lies below and left of centre.
 
 The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent.
 

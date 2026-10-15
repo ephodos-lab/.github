@@ -2,22 +2,27 @@
 
 The mark is one formula. Take a lattice that is uniform in log-polar coordinates,
 
-    r = q^-j,   theta = 2 pi k / N + j d        (arm k = 0..N-1, ring j = 0..J),   q = phi^(1/3),
+    r = phi^(-j/2),   theta = 2 pi k / N + j d / phi^2     (arm k = 0..N-1, ring j = 0..13),
 
-lift it onto the logarithmic funnel z = c ln r, and look at it through a pinhole camera
-tilted by `tilt`. Each ring is the one outside it scaled by 1/q, turned by d and sunk by
-c ln q, so every arm is a logarithmic spiral; three rings make one golden ratio phi.
+where phi is the golden ratio and d = 2 pi / N the gap between arms: two rings make one
+phi, and each ring is turned by 1/phi^2 of the gap, so every arm is a logarithmic spiral.
+Lay it on the funnel z = ln r and look at it obliquely, so depth slides each ring along
+the major axis:
 
-A spiral r = r_min phi^(4 (theta - theta0) / pi), which grows by phi every eighth of a turn,
-runs from the throat to the rim. Let psi be a point's angle measured from that spiral. Dots
-shrink inside a smooth band centred on it:
+    major = r cos theta + a ln(1/r),   minor = eps r sin theta,   a just under r_min.
 
-    radius = rho r^gamma f (1 - W band),    band = ((1 + cos psi) / 2)^s,
-    W = w_rim + (1 - w_rim) (ln r / ln r_min)^kappa,
+The throat then sits off centre and its far wall is seen almost edge-on, a dense crescent.
 
-where f is the camera's perspective. The band is deepest at the throat and still dims the
-rim, so the fade sweeps from the centre all the way out. Hairlines are the arm spirals,
-drawn between neighbouring visible dots.
+The dots fade along a band centred on another logarithmic spiral, theta = theta0 - pi u with
+u = ln(r / r_min) / ln(1 / r_min): it leaves the throat at theta0 and turns half a turn, the
+same way as the arms, on its way out to the rim. With psi a point's angle from the band,
+
+    psi = theta - theta0 + pi u,   b = ((1 + cos psi) / 2)^(sharp r^(1/3)),   m = 1 - (1 - c u) b,
+
+so the band is wide and deep at the throat and narrows, but stays deep, out to the rim. The
+dot radius is rho r^gamma m (the outermost dot of each arm phi times larger), and each arm is
+a stroke whose half-width is a tenth of rho r^gamma times m^4, so the band shows as a white
+spiral that runs from the throat through the outermost ring.
 
 The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent;
 the tagline is Jost.
@@ -48,50 +53,45 @@ PHI = (1 + 5 ** 0.5) / 2
 
 VORTEX = dict(
     N=32,                       # arms
-    q=PHI ** (1 / 3),           # each ring is 1/q the size of the one outside it: three rings make phi
-    d=2 * math.pi / 32 / 3,     # ...and turned by a third of the arm spacing
-    c=0.14,                     # funnel depth: z = c ln r
-    r_min=0.15,                 # the throat: rings stop at this radius
-    tilt=math.radians(45),      # camera tilt
-    dist=3.4,                   # camera distance, in rim radii
-    spin=math.radians(225),     # turn of the finished image
-    rho=0.026, gamma=0.5,       # dot radius rho r^gamma before perspective and fade
-    theta0=math.radians(270),   # where the fading spiral leaves the throat
-    growth=PHI,                 # the fading spiral grows by phi every eighth of a turn
-    s=3.0,                      # sharpness of the fading band
-    w_rim=0.65, kappa=0.5,      # fade depth on the rim, and how it deepens toward the throat
-    min_size=0.12,              # dots faded below this fraction are left out
+    J=13,                       # rings inside the rim; ring j has radius phi^(-j/2)
+    turn=1 / PHI ** 2,          # each ring is turned by this fraction of the gap between arms
+    lean=0.98,                  # depth slides ring r by lean r_min ln(1/r) along the major axis (< 1: no fold)
+    eps=2 / 3,                  # foreshortening of the minor axis
+    beta=math.radians(143),     # direction of the major axis on screen (y down), toward the throat
+    rho=0.02, gamma=0.5,        # dot radius rho r^gamma before the fade
+    tip=PHI,                    # the outermost dot of each arm is phi times larger
+    stroke=0.1,                 # half-width of an arm's stroke, as a fraction of its dot radius
+    theta0=math.radians(125),   # where the fading band leaves the throat
+    sweep=math.pi,              # how far the band turns from the throat to the rim
+    sharp=13.0, sharp_pow=1 / 3,  # band = ((1 + cos psi) / 2)^(sharp r^sharp_pow): wide at the throat, narrow at the rim
+    c=0.15,                     # the band's depth falls from 1 at the throat to 1 - c at the rim
+    min_fade=0.04,              # dots faded below this are left out
 )
 
 
-def _project(x, y, z, v):
-    ct, st = math.cos(v["tilt"]), math.sin(v["tilt"])
-    y2, z2 = y * ct - z * st, y * st + z * ct
-    f = v["dist"] / (v["dist"] - z2)
-    X, Y = x * f, y2 * f
-    cs, ss = math.cos(v["spin"]), math.sin(v["spin"])
-    return X * cs - Y * ss, -(X * ss + Y * cs), f            # screen y points down
-
-
-def vortex(v=VORTEX):
-    """The arms of the mark: dot centres, dot radii and the visible pieces of each arm spiral."""
-    J = int(math.floor(math.log(1 / v["r_min"]) / math.log(v["q"])))
+def vortex(v=VORTEX, sub=6):
+    """The arms of the mark: dot centres and radii, and each arm's centre line with its stroke half-width."""
+    q, J, N = PHI ** 0.5, v["J"], v["N"]
+    r_min = q ** -J
+    a, L = v["lean"] * r_min, math.log(1 / r_min)
+    d = 2 * math.pi / N * v["turn"]
+    cb, sb = math.cos(v["beta"]), math.sin(v["beta"])
     arms = []
-    for k in range(v["N"]):
+    for k in range(N):
         def at(j):
-            j = np.asarray(j, float)
-            r = v["q"] ** -j
-            t = 2 * math.pi * k / v["N"] + j * v["d"]
-            x, y, f = _project(r * np.cos(t), r * np.sin(t), v["c"] * np.log(r), v)
-            psi = t - v["theta0"] - (math.pi / 4) * np.log(r / v["r_min"]) / math.log(v["growth"])
-            band = ((1 + np.cos(psi)) / 2) ** v["s"]
-            depth = np.clip(np.log(r) / math.log(v["r_min"]), 0, 1) ** v["kappa"]
-            fade = 1 - (v["w_rim"] + (1 - v["w_rim"]) * depth) * band
-            return x, y, v["rho"] * r ** v["gamma"] * f * fade, fade
-        x, y, rad, fade = at(np.arange(J + 1))
-        vis = fade >= v["min_size"]
-        segs = [at(np.linspace(i, i + 1, 41))[:2] for i in range(J) if vis[i] and vis[i + 1]]
-        arms.append({"x": x[vis], "y": y[vis], "r": rad[vis], "segs": segs})
+            r = q ** -np.asarray(j, float)
+            t = 2 * math.pi * k / N + np.asarray(j, float) * d
+            major, minor = r * np.cos(t) + a * np.log(1 / r), v["eps"] * r * np.sin(t)
+            u = np.log(r / r_min) / L
+            b = ((1 + np.cos(t - v["theta0"] + v["sweep"] * u)) / 2) ** (v["sharp"] * r ** v["sharp_pow"])
+            m = 1 - (1 - v["c"] * u) * b
+            return major * cb - minor * sb, major * sb + minor * cb, v["rho"] * r ** v["gamma"], m
+        x, y, rad, m = at(np.arange(J + 1))
+        rad = rad * m
+        rad[0] *= v["tip"]
+        vis = m >= v["min_fade"]
+        lx, ly, lr, lm = at(np.linspace(0, J, J * sub + 1))
+        arms.append({"x": x[vis], "y": y[vis], "r": rad[vis], "line": (lx, ly, v["stroke"] * lr * lm ** 4)})
     return arms
 
 
@@ -101,21 +101,35 @@ def mark_bounds(arms):
     return xs.min(), ys.min(), xs.max() - xs.min(), ys.max() - ys.min()
 
 
-def mark_svg(arms, box, color, hairline=0.0016, hairline_opacity=0.75, dot_scale=1.0, min_px=0.4):
+def _ribbon(x, y, hw):
+    """Outline of a stroke along (x, y) with half-width hw, as one closed polygon."""
+    dx, dy = np.gradient(x), np.gradient(y)
+    n = np.hypot(dx, dy)
+    nx, ny = -dy / n * hw, dx / n * hw
+    return np.r_[np.c_[x + nx, y + ny], np.c_[x - nx, y - ny][::-1]]
+
+
+def mark_svg(arms, box, color, dot_scale=1.0, stroke_scale=1.0, min_px=0.4, min_stroke_px=0.06):
     """SVG group drawing the mark scaled into box = (x, y, width, height), centred.
 
-    hairline is the line width as a fraction of the drawn width. dot_scale enlarges every dot
-    (a heavier cut for small sizes); dots smaller than min_px after scaling are left out."""
+    dot_scale and stroke_scale thicken the dots and strokes (a heavier cut for small sizes);
+    dots smaller than min_px and strokes thinner than min_stroke_px after scaling are left out."""
     x0, y0, w, h = mark_bounds(arms)
     s = min(box[2] / w, box[3] / h)
     ox, oy = box[0] + (box[2] - w * s) / 2 - x0 * s, box[1] + (box[3] - h * s) / 2 - y0 * s
     f = lambda v: ("%.2f" % v).rstrip("0").rstrip(".")
-    lines = "".join('<polyline points="%s"/>' % " ".join(f"{f(ox + px * s)},{f(oy + py * s)}" for px, py in zip(*seg))
-                    for a in arms for seg in a["segs"])
+    strokes = []
+    for a in arms:
+        lx, ly, hw = a["line"]
+        hw = hw * s * stroke_scale
+        idx = np.flatnonzero(2 * hw >= min_stroke_px)
+        for run in np.split(idx, np.flatnonzero(np.diff(idx) > 1) + 1):
+            if len(run) > 1:
+                poly = _ribbon(ox + lx[run] * s, oy + ly[run] * s, hw[run])
+                strokes.append("M" + "L".join(f"{f(px)} {f(py)}" for px, py in poly) + "Z")
     dots = "".join(f'<circle cx="{f(ox + px * s)}" cy="{f(oy + py * s)}" r="{f(pr * s * dot_scale)}"/>'
                    for a in arms for px, py, pr in zip(a["x"], a["y"], a["r"]) if pr * s * dot_scale >= min_px)
-    return (f'<g fill="none" stroke="{color}" stroke-width="{f(hairline * w * s)}" stroke-opacity="{hairline_opacity}" '
-            f'stroke-linecap="round" stroke-linejoin="round">{lines}</g><g fill="{color}">{dots}</g>')
+    return f'<g fill="{color}"><path d="{"".join(strokes)}"/>{dots}</g>'
 
 
 # ------------------------------------------------------------- the wordmark
@@ -245,8 +259,8 @@ def build(fonts, out):
 
     # avatar: the mark on white
     for name, bg, ink in (("avatar.svg", PAPER, INK), ("avatar-on-dark.svg", INK, IVORY)):
-        files[name] = svg_doc(1024, 1024, mark_svg(arms, (92, 92, 840, 840), ink, hairline=0.0032, hairline_opacity=0.9,
-                                                    dot_scale=1.6, min_px=1.5), "Ephodos Lab", bg=bg)
+        files[name] = svg_doc(1024, 1024, mark_svg(arms, (92, 92, 840, 840), ink, dot_scale=1.4, stroke_scale=1.6,
+                                                    min_px=1.2), "Ephodos Lab", bg=bg)
     # banner for the organisation profile
     W, Hh = 1600, 480
     _, _, mw, mh = mark_bounds(arms)
