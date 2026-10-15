@@ -109,11 +109,11 @@ def _ribbon(x, y, hw):
     return np.r_[np.c_[x + nx, y + ny], np.c_[x - nx, y - ny][::-1]]
 
 
-def mark_svg(arms, box, color, dot_scale=1.0, stroke_scale=1.0, min_px=0.4, min_stroke_px=0.06):
+def mark_svg(arms, box, color, min_dot=0.001, min_stroke=0.00015):
     """SVG group drawing the mark scaled into box = (x, y, width, height), centred.
 
-    dot_scale and stroke_scale thicken the dots and strokes (a heavier cut for small sizes);
-    dots smaller than min_px and strokes thinner than min_stroke_px after scaling are left out."""
+    Dots with a radius below min_dot and strokes narrower than min_stroke, both as fractions of
+    the drawn width, are left out, so the mark keeps the same dots at every size."""
     x0, y0, w, h = mark_bounds(arms)
     s = min(box[2] / w, box[3] / h)
     ox, oy = box[0] + (box[2] - w * s) / 2 - x0 * s, box[1] + (box[3] - h * s) / 2 - y0 * s
@@ -121,14 +121,13 @@ def mark_svg(arms, box, color, dot_scale=1.0, stroke_scale=1.0, min_px=0.4, min_
     strokes = []
     for a in arms:
         lx, ly, hw = a["line"]
-        hw = hw * s * stroke_scale
-        idx = np.flatnonzero(2 * hw >= min_stroke_px)
+        idx = np.flatnonzero(2 * hw >= min_stroke * w)
         for run in np.split(idx, np.flatnonzero(np.diff(idx) > 1) + 1):
             if len(run) > 1:
-                poly = _ribbon(ox + lx[run] * s, oy + ly[run] * s, hw[run])
+                poly = _ribbon(ox + lx[run] * s, oy + ly[run] * s, hw[run] * s)
                 strokes.append("M" + "L".join(f"{f(px)} {f(py)}" for px, py in poly) + "Z")
-    dots = "".join(f'<circle cx="{f(ox + px * s)}" cy="{f(oy + py * s)}" r="{f(pr * s * dot_scale)}"/>'
-                   for a in arms for px, py, pr in zip(a["x"], a["y"], a["r"]) if pr * s * dot_scale >= min_px)
+    dots = "".join(f'<circle cx="{f(ox + px * s)}" cy="{f(oy + py * s)}" r="{f(pr * s)}"/>'
+                   for a in arms for px, py, pr in zip(a["x"], a["y"], a["r"]) if pr >= min_dot * w)
     return f'<g fill="{color}"><path d="{"".join(strokes)}"/>{dots}</g>'
 
 
@@ -259,8 +258,7 @@ def build(fonts, out):
 
     # avatar: the mark on white
     for name, bg, ink in (("avatar.svg", PAPER, INK), ("avatar-on-dark.svg", INK, IVORY)):
-        files[name] = svg_doc(1024, 1024, mark_svg(arms, (92, 92, 840, 840), ink, dot_scale=1.4, stroke_scale=1.6,
-                                                    min_px=1.2), "Ephodos Lab", bg=bg)
+        files[name] = svg_doc(1024, 1024, mark_svg(arms, (92, 92, 840, 840), ink), "Ephodos Lab", bg=bg)
     # banner for the organisation profile
     W, Hh = 1600, 480
     _, _, mw, mh = mark_bounds(arms)
