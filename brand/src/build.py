@@ -8,15 +8,16 @@ lift it onto the logarithmic funnel z = c ln r, and look at it through a pinhole
 tilted by `tilt`. Each ring is the one outside it scaled by 1/q, turned by d and sunk by
 c ln q, so every arm is a logarithmic spiral; three rings make one golden ratio phi.
 
-A golden spiral r = r_min phi^(2 (theta - theta0) / pi), which grows by phi every quarter
-turn, unwinds from the throat. Let psi in [0, 2 pi) be how far a point lies behind it.
-Dots fade toward the spiral's trailing side, strongly at the throat and not at all on the
-rim:
+A spiral r = r_min phi^(4 (theta - theta0) / pi), which grows by phi every eighth of a turn,
+runs from the throat to the rim. Let psi be a point's angle measured from that spiral. Dots
+shrink inside a smooth band centred on it:
 
-    radius = rho r^gamma f (1 - w (1 - (psi / 2 pi)^p)),    w = (ln r / ln r_min)^kappa,
+    radius = rho r^gamma f (1 - W band),    band = ((1 + cos psi) / 2)^s,
+    W = w_rim + (1 - w_rim) (ln r / ln r_min)^kappa,
 
-where f is the camera's perspective. The spiral itself is the sharp edge where the fade
-starts again. Hairlines are the arm spirals, drawn between neighbouring visible dots.
+where f is the camera's perspective. The band is deepest at the throat and still dims the
+rim, so the fade sweeps from the centre all the way out. Hairlines are the arm spirals,
+drawn between neighbouring visible dots.
 
 The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent;
 the tagline is Jost.
@@ -55,9 +56,11 @@ VORTEX = dict(
     dist=3.4,                   # camera distance, in rim radii
     spin=math.radians(225),     # turn of the finished image
     rho=0.026, gamma=0.5,       # dot radius rho r^gamma before perspective and fade
-    theta0=0.0,                 # where the golden spiral leaves the throat
-    p=2.5, kappa=0.15,          # fade profile behind the spiral, and how far out it reaches
-    min_size=0.20,              # dots faded below this fraction are left out
+    theta0=math.radians(270),   # where the fading spiral leaves the throat
+    growth=PHI,                 # the fading spiral grows by phi every eighth of a turn
+    s=3.0,                      # sharpness of the fading band
+    w_rim=0.65, kappa=0.5,      # fade depth on the rim, and how it deepens toward the throat
+    min_size=0.12,              # dots faded below this fraction are left out
 )
 
 
@@ -80,9 +83,10 @@ def vortex(v=VORTEX):
             r = v["q"] ** -j
             t = 2 * math.pi * k / v["N"] + j * v["d"]
             x, y, f = _project(r * np.cos(t), r * np.sin(t), v["c"] * np.log(r), v)
-            psi = np.mod(t - v["theta0"] - (math.pi / 2) * np.log(r / v["r_min"]) / math.log(PHI), 2 * math.pi)
-            w = np.clip(np.log(r) / math.log(v["r_min"]), 0, 1) ** v["kappa"]
-            fade = 1 - w * (1 - (psi / (2 * math.pi)) ** v["p"])
+            psi = t - v["theta0"] - (math.pi / 4) * np.log(r / v["r_min"]) / math.log(v["growth"])
+            band = ((1 + np.cos(psi)) / 2) ** v["s"]
+            depth = np.clip(np.log(r) / math.log(v["r_min"]), 0, 1) ** v["kappa"]
+            fade = 1 - (v["w_rim"] + (1 - v["w_rim"]) * depth) * band
             return x, y, v["rho"] * r ** v["gamma"] * f * fade, fade
         x, y, rad, fade = at(np.arange(J + 1))
         vis = fade >= v["min_size"]

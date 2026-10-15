@@ -6,11 +6,11 @@ $$r = q^{-j},\qquad \theta = \frac{2\pi k}{N} + j\,\delta \qquad (k = 0,\dots,N-
 
 place it on the logarithmic funnel $z = c\ln r$, and view it through a tilted pinhole camera. Each ring is the ring outside it scaled by $1/q$, turned by $\delta$ and sunk by $c\ln q$, so three rings make one $\varphi$ and every arm is a logarithmic spiral.
 
-A golden spiral $r = r_{\min}\,\varphi^{2(\theta-\theta_0)/\pi}$, which grows by $\varphi$ every quarter turn, unwinds from the throat. If $\psi \in [0, 2\pi)$ is how far a point lies behind it, the dots fade on the spiral's trailing side:
+A spiral $r = r_{\min}\,\varphi^{4(\theta-\theta_0)/\pi}$, which grows by $\varphi$ every eighth of a turn, runs from the throat to the rim. If $\psi$ is a point's angle measured from that spiral, the dots shrink inside a smooth band centred on it:
 
-$$\text{radius} = \rho\, r^{\gamma} f \left(1 - w\left(1 - \left(\tfrac{\psi}{2\pi}\right)^{p}\right)\right),\qquad w = \left(\frac{\ln r}{\ln r_{\min}}\right)^{\kappa},$$
+$$\text{radius} = \rho\, r^{\gamma} f\,(1 - W b),\qquad b = \left(\frac{1 + \cos\psi}{2}\right)^{s},\qquad W = w_{\text{rim}} + (1 - w_{\text{rim}})\left(\frac{\ln r}{\ln r_{\min}}\right)^{\kappa},$$
 
-where $f$ is the camera's perspective factor. The fade is strongest at the throat and vanishes at the rim, so the outer ring stays whole and the golden spiral appears as the edge where the fade begins again. The values are $N = 32$, $\delta = 2\pi/96$ (a third of the arm spacing), $c = 0.14$, a tilt of $45^\circ$, $r_{\min} = 0.15$, $\gamma = 0.5$, $p = 2.5$ and $\kappa = 0.15$.
+where $f$ is the camera's perspective factor. The band is deepest at the throat and still dims the rim, so the fade sweeps as one continuous band from the centre all the way out. The values are $N = 32$, $\delta = 2\pi/96$ (a third of the arm spacing), $c = 0.14$, a tilt of $45^\circ$, $r_{\min} = 0.15$, $\gamma = 0.5$, $\theta_0 = 270^\circ$, $s = 3$, $w_{\text{rim}} = 0.65$ and $\kappa = 0.5$.
 
 The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent.
 
