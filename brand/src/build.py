@@ -2,14 +2,21 @@
 
 The mark is one formula. Take a lattice that is uniform in log-polar coordinates,
 
-    r = q^-j,   theta = 2 pi k / N + j d        (arm k = 0..N-1, ring j = 0..J),
+    r = q^-j,   theta = 2 pi k / N + j d        (arm k = 0..N-1, ring j = 0..J),   q = phi^(1/3),
 
 lift it onto the logarithmic funnel z = c ln r, and look at it through a pinhole camera
 tilted by `tilt`. Each ring is the one outside it scaled by 1/q, turned by d and sunk by
-c ln q, so every arm is a logarithmic spiral and the rings fall evenly into the throat.
-A dot's radius is proportional to r (the pattern is self-similar) times the camera's
-perspective, so near dots are larger. The hairlines are the same spirals drawn
-continuously.
+c ln q, so every arm is a logarithmic spiral; three rings make one golden ratio phi.
+
+A golden spiral r = r_min phi^(2 (theta - theta0) / pi), which grows by phi every quarter
+turn, unwinds from the throat. Let psi in [0, 2 pi) be how far a point lies behind it.
+Dots fade toward the spiral's trailing side, strongly at the throat and not at all on the
+rim:
+
+    radius = rho r^gamma f (1 - w (1 - (psi / 2 pi)^p)),    w = (ln r / ln r_min)^kappa,
+
+where f is the camera's perspective. The spiral itself is the sharp edge where the fade
+starts again. Hairlines are the arm spirals, drawn between neighbouring visible dots.
 
 The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent;
 the tagline is Jost.
@@ -36,16 +43,21 @@ INK, PAPER, IVORY = "#0B1220", "#FFFFFF", "#EAE3D2"
 
 # ---------------------------------------------------------------- the mark
 
+PHI = (1 + 5 ** 0.5) / 2
+
 VORTEX = dict(
     N=32,                       # arms
-    q=1.17,                     # each ring is 1/q the size of the one outside it
+    q=PHI ** (1 / 3),           # each ring is 1/q the size of the one outside it: three rings make phi
     d=2 * math.pi / 32 / 3,     # ...and turned by a third of the arm spacing
     c=0.14,                     # funnel depth: z = c ln r
     r_min=0.15,                 # the throat: rings stop at this radius
     tilt=math.radians(45),      # camera tilt
     dist=3.4,                   # camera distance, in rim radii
     spin=math.radians(225),     # turn of the finished image
-    rho=0.023,                  # dot radius as a fraction of r
+    rho=0.026, gamma=0.5,       # dot radius rho r^gamma before perspective and fade
+    theta0=0.0,                 # where the golden spiral leaves the throat
+    p=2.5, kappa=0.15,          # fade profile behind the spiral, and how far out it reaches
+    min_size=0.20,              # dots faded below this fraction are left out
 )
 
 
@@ -59,17 +71,23 @@ def _project(x, y, z, v):
 
 
 def vortex(v=VORTEX):
-    """The arms of the mark: dot centres, dot radii and the spiral through them."""
+    """The arms of the mark: dot centres, dot radii and the visible pieces of each arm spiral."""
     J = int(math.floor(math.log(1 / v["r_min"]) / math.log(v["q"])))
     arms = []
     for k in range(v["N"]):
         def at(j):
-            r = v["q"] ** -np.asarray(j, float)
-            t = 2 * math.pi * k / v["N"] + np.asarray(j, float) * v["d"]
-            return _project(r * np.cos(t), r * np.sin(t), v["c"] * np.log(r), v) + (r,)
-        x, y, f, r = at(np.arange(J + 1))
-        lx, ly, _, _ = at(np.linspace(0, J, 40 * J + 1))
-        arms.append({"x": x, "y": y, "r": v["rho"] * r * f, "line": (lx, ly)})
+            j = np.asarray(j, float)
+            r = v["q"] ** -j
+            t = 2 * math.pi * k / v["N"] + j * v["d"]
+            x, y, f = _project(r * np.cos(t), r * np.sin(t), v["c"] * np.log(r), v)
+            psi = np.mod(t - v["theta0"] - (math.pi / 2) * np.log(r / v["r_min"]) / math.log(PHI), 2 * math.pi)
+            w = np.clip(np.log(r) / math.log(v["r_min"]), 0, 1) ** v["kappa"]
+            fade = 1 - w * (1 - (psi / (2 * math.pi)) ** v["p"])
+            return x, y, v["rho"] * r ** v["gamma"] * f * fade, fade
+        x, y, rad, fade = at(np.arange(J + 1))
+        vis = fade >= v["min_size"]
+        segs = [at(np.linspace(i, i + 1, 41))[:2] for i in range(J) if vis[i] and vis[i + 1]]
+        arms.append({"x": x[vis], "y": y[vis], "r": rad[vis], "segs": segs})
     return arms
 
 
@@ -88,7 +106,8 @@ def mark_svg(arms, box, color, hairline=0.0016, hairline_opacity=0.75, dot_scale
     s = min(box[2] / w, box[3] / h)
     ox, oy = box[0] + (box[2] - w * s) / 2 - x0 * s, box[1] + (box[3] - h * s) / 2 - y0 * s
     f = lambda v: ("%.2f" % v).rstrip("0").rstrip(".")
-    lines = "".join('<polyline points="%s"/>' % " ".join(f"{f(ox + px * s)},{f(oy + py * s)}" for px, py in zip(*a["line"])) for a in arms)
+    lines = "".join('<polyline points="%s"/>' % " ".join(f"{f(ox + px * s)},{f(oy + py * s)}" for px, py in zip(*seg))
+                    for a in arms for seg in a["segs"])
     dots = "".join(f'<circle cx="{f(ox + px * s)}" cy="{f(oy + py * s)}" r="{f(pr * s * dot_scale)}"/>'
                    for a in arms for px, py, pr in zip(a["x"], a["y"], a["r"]) if pr * s * dot_scale >= min_px)
     return (f'<g fill="none" stroke="{color}" stroke-width="{f(hairline * w * s)}" stroke-opacity="{hairline_opacity}" '

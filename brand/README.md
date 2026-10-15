@@ -1,10 +1,16 @@
 # Brand assets
 
-The mark is a dotted vortex, a picture of many lines of work converging on one problem. It is a single formula: the lattice
+The mark is a dotted vortex, a picture of many lines of work converging on one problem, and it is built from the golden ratio $\varphi$. Start from the lattice
 
-$$r = q^{-j},\qquad \theta = \frac{2\pi k}{N} + j\,\delta \qquad (k = 0,\dots,N-1;\ j = 0,\dots,J)$$
+$$r = q^{-j},\qquad \theta = \frac{2\pi k}{N} + j\,\delta \qquad (k = 0,\dots,N-1;\ j = 0,\dots,J),\qquad q = \varphi^{1/3},$$
 
-placed on the logarithmic funnel $z = c\ln r$ and seen through a tilted pinhole camera. Each ring is the ring outside it scaled by $1/q$, turned by $\delta$ and sunk by $c\ln q$, so every arm is a logarithmic spiral. A dot's radius is proportional to $r$ times the camera's perspective, so the pattern is self-similar and the near side is larger. The values are $N = 32$, $q = 1.17$, $\delta = 2\pi/96$ (a third of the arm spacing), $c = 0.14$, a tilt of $45^\circ$, and rings down to $r = 0.15$.
+place it on the logarithmic funnel $z = c\ln r$, and view it through a tilted pinhole camera. Each ring is the ring outside it scaled by $1/q$, turned by $\delta$ and sunk by $c\ln q$, so three rings make one $\varphi$ and every arm is a logarithmic spiral.
+
+A golden spiral $r = r_{\min}\,\varphi^{2(\theta-\theta_0)/\pi}$, which grows by $\varphi$ every quarter turn, unwinds from the throat. If $\psi \in [0, 2\pi)$ is how far a point lies behind it, the dots fade on the spiral's trailing side:
+
+$$\text{radius} = \rho\, r^{\gamma} f \left(1 - w\left(1 - \left(\tfrac{\psi}{2\pi}\right)^{p}\right)\right),\qquad w = \left(\frac{\ln r}{\ln r_{\min}}\right)^{\kappa},$$
+
+where $f$ is the camera's perspective factor. The fade is strongest at the throat and vanishes at the rim, so the outer ring stays whole and the golden spiral appears as the edge where the fade begins again. The values are $N = 32$, $\delta = 2\pi/96$ (a third of the arm spacing), $c = 0.14$, a tilt of $45^\circ$, $r_{\min} = 0.15$, $\gamma = 0.5$, $p = 2.5$ and $\kappa = 0.15$.
 
 The wordmark sets EPHODOS LAB in Cormorant Garamond with the first O drawn as a crescent.
 
