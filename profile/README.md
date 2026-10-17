@@ -11,7 +11,7 @@ Ephodos Lab builds open-source tools for automated mathematical research. They c
 | **topic-gate** | Problem selection | Agents propose research problems. Fresh reviewer agents try to rule each one out, and only problems that survive reach a human for approval. | Coming soon |
 | **proofsiege** | Research | A team of AI agents lays siege to one problem until it is proved or refuted. A fresh verifier checks every claim before later work may build on it. Based on [frenzymath/Danus](https://github.com/frenzymath/Danus) (Apache-2.0). | Coming soon |
 | **mathgalley** | Writing | Turns notes, proofs, code and existing manuscripts into a paper, then reviews it before submission. | In development |
-| Integrated platform | All three | Runs the three stages as one pipeline. | Planned |
+| **Euresis** | All three | The integrated platform: runs the three stages as one pipeline. | Planned |
 
 Repositories appear on this page as they are released.
 
@@ -21,9 +21,11 @@ Repositories appear on this page as they are released.
 - **Exploration is free, proof is strict.** Agents may try anything, but a result counts only after a verifier accepts it.
 - **We say how results were made.** Papers produced with these tools state plainly what AI contributed.
 
-## Why "Ephodos"
+## Where the names come from
 
 *Ephodos* (ἔφοδος, "the method") is the title of a letter from Archimedes to Eratosthenes. In it Archimedes explains how he found results such as the volume of the sphere by weighing shapes against each other on a lever, and why he still proved them afterwards by rigorous geometry. He wrote the method down in the hope that others would use it to find theorems he had not thought of.
+
+The integrated platform is called *Euresis* (εὕρεσις, "finding"). The word comes from the verb of Archimedes' *eureka*, and the letter uses the same verb at both ends of its preface: it opens with theorems he had found and closes with the hope that others will find more.
 
 ---
 
@@ -39,7 +41,7 @@ Ephodos Lab 开发用于自动化数学研究的开源工具，覆盖一个研�
 | **topic-gate** | 选题 | agent 提出研究问题，再由新开的审稿 agent 设法否掉它们，挺过审查的题才交给人决定是否放行。 | 即将发布 |
 | **proofsiege** | 研究 | 一组 AI agent 围攻一道题，直到证明或否证它；每条结论都要先由新开的 verifier 核查，后续工作才能以它为基础。基于 [frenzymath/Danus](https://github.com/frenzymath/Danus)（Apache-2.0）。 | 即将发布 |
 | **mathgalley** | 写作 | 把笔记、证明、代码和已有稿件整理成论文，并在投稿前审查。 | 开发中 |
-| 一体化平台 | 全流程 | 把三个阶段串成一条流水线。 | 规划中 |
+| **Euresis** | 全流程 | 一体化平台，把三个阶段串成一条流水线。 | 规划中 |
 
 ### 工作方式
 
@@ -50,5 +52,7 @@ Ephodos Lab 开发用于自动化数学研究的开源工具，覆盖一个研�
 ### 名字的来历
 
 *Ephodos*（ἔφοδος，意为「方法」）是阿基米德写给埃拉托色尼的一封信的标题。阿基米德在信里讲，他先在杠杆上称量图形，由此发现球的体积等结果，之后仍用严格的几何证明它们。他把这个方法写下来，是希望别人能用它发现他自己还没想到的定理。
+
+一体化平台叫 *Euresis*（εὕρεσις，意为「发现」）。这个词和阿基米德那声 *eureka*（「我找到了」）出自同一个动词，这封信的序言首尾用的也是它：开头讲他已经发现的定理，结尾希望别人发现更多。
 
 </details>
